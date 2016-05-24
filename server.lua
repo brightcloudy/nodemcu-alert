@@ -1,9 +1,22 @@
-function alert()
+function alertsuccess()
     pwm.setup(2, 1000, 512)
     for i=0,5,1 do
         gpio.write(0, gpio.LOW)
         pwm.start(2)
         tmr.delay(100000)
+        gpio.write(0, gpio.HIGH)
+        pwm.stop(2)
+        tmr.delay(100000)
+    end
+    pwm.close(2)
+end
+
+function alertfailure()
+    pwm.setup(2, 831, 512)
+    for i=0,5,1 do
+        gpio.write(0, gpio.LOW)
+        pwm.start(2)
+        tmr.delay(200000)
         gpio.write(0, gpio.HIGH)
         pwm.stop(2)
         tmr.delay(100000)
@@ -17,12 +30,18 @@ function srvreceive(c, pl)
     if cmdtext == "running" then
         gpio.write(1, gpio.LOW)
     end
-    if cmdtext == "done" then
+    if cmdtext == "doneok" then
         gpio.write(1, gpio.HIGH)
-        tmr.alarm(0, 2000, tmr.ALARM_AUTO, alert)
-        alert()
+        tmr.alarm(0, 2000, tmr.ALARM_AUTO, alertsuccess)
+        alertsuccess()
+    end
+    if cmdtext == "donefail" then
+        gpio.write(1, gpio.HIGH)
+        tmr.alarm(0, 2000, tmr.ALARM_AUTO, alertfailure)
+        alertfailure()
     end
     if cmdtext == "ack" then
+        gpio.write(1, gpio.HIGH)
         tmr.stop(0)
         tmr.unregister(0)
     end

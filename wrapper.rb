@@ -32,8 +32,9 @@ config = JSON.parse(File.open(@configfile).readline)
 abort "Please specify command to execute and watch." if ARGV.length == 0
 cmd = ARGV.join(" ")
 send_command config, "running"
-system cmd
-send_command config, "done"
+ret = system cmd
+send_command config, "doneok" if ret
+send_command config, "donefail" if not ret
 print "Done! --ENTER--"
 $stdin.getc
 send_command config, "ack"
